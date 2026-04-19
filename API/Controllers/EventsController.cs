@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers;
 
 [ApiController]
-[Route("api/v1/[controller]")] // La ruta será: api/v1/events
+[Route("api/v1/[controller]")] // La ruta sera: api/v1/events
 public class EventsController : ControllerBase
 {
     private readonly GetEventsHandler _getEventsHandler;
     private readonly GetSeatsBySectorHandler _getSeatsHandler;
 
-    // Inyectamos ambos Handlers a través del constructor
+    // Inyectamos ambos Handlers a traves del constructor
     public EventsController(
         GetEventsHandler getEventsHandler, 
         GetSeatsBySectorHandler getSeatsHandler)
@@ -19,7 +19,7 @@ public class EventsController : ControllerBase
         _getSeatsHandler = getSeatsHandler;
     }
 
-    // Endpoint para listar todos los eventos (Catálogo)
+    // Endpoint para listar todos los eventos (Catalogo)
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {

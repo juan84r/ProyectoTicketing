@@ -22,7 +22,7 @@ public class GetSeatsBySectorHandler
     // 2. Buscamos el sector dentro de ese evento
     var sector = eventData?.Sectors.FirstOrDefault(s => s.Id == sectorId);
     
-    // 3. VALIDACIÓN PROFESIONAL
+    // 3. VALIDACION PROFESIONAL
     if (sector == null) 
     {
         throw new NotFoundException($"No se encontró el sector con ID {sectorId} para este evento.");
@@ -30,7 +30,7 @@ public class GetSeatsBySectorHandler
 
     // 4. Mapeamos los asientos a DTOs de respuesta ORDENADOS
     return sector.Seats
-        .OrderBy(s => s.SeatNumber) // <--- ESTO ES LO QUE FALTA
+        .OrderBy(s => s.SeatNumber) 
         .Select(s => new SeatResponse(
             s.Id, 
             s.RowIdentifier, 

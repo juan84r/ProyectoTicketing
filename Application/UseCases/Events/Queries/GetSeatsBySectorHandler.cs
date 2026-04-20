@@ -14,21 +14,21 @@ public class GetSeatsBySectorHandler
         _eventRepository = eventRepository;
     }
 
-    public async Task<IEnumerable<SeatResponse>> HandleAsync(int sectorId)
+    public async Task<IEnumerable<SeatResponse>?> HandleAsync(int sectorId)
 {
-    // 1. Buscamos el evento (usamos el ID 1 por ahora como seed)
+    // 1. Buscamos el evento
     var eventData = await _eventRepository.GetEventByIdAsync(1);
     
-    // 2. Buscamos el sector dentro de ese evento
+    // 2. Buscamos el sector
     var sector = eventData?.Sectors.FirstOrDefault(s => s.Id == sectorId);
     
-    // 3. VALIDACION PROFESIONAL
+    // 3. CAMBIO CLAVE: Si no existe, devolvemos null prolijamente
     if (sector == null) 
     {
-        throw new NotFoundException($"No se encontró el sector con ID {sectorId} para este evento.");
+        return null; 
     }
 
-    // 4. Mapeamos los asientos a DTOs de respuesta ORDENADOS
+    // 4. Mapeamos y devolvemos los asientos
     return sector.Seats
         .OrderBy(s => s.SeatNumber) 
         .Select(s => new SeatResponse(

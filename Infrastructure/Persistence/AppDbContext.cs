@@ -24,6 +24,11 @@ public class AppDbContext : DbContext
             .Property(s => s.Version)
             .IsConcurrencyToken();
 
+        // RESTRICCION DE UNICIDAD: Evita duplicados fisicos en la BD
+        modelBuilder.Entity<Seat>()
+            .HasIndex(s => s.SeatNumber)
+            .IsUnique();
+
         // --- PRECARGA DE DATOS (SEEDING) ---
         
         // 1. Crear el Evento
@@ -36,21 +41,19 @@ public class AppDbContext : DbContext
             Status = "Active" 
         });
 
-        // 2. Crear los Sectores (ID 1: Baja, ID 2: Alta)
+        // 2. Crear los Sectores
         modelBuilder.Entity<Sector>().HasData(
             new Sector { Id = 1, EventId = 1, Name = "Platea Baja", Price = 5000, Capacity = 50 },
             new Sector { Id = 2, EventId = 1, Name = "Platea Alta", Price = 8000, Capacity = 50 }
         );
 
-        // 3. Generación dinámica de los 100 asientos
+        // 3. Generacion dinamica de los 100 asientos con IDs DETERMINISTICOS
         var seats = new List<Seat>();
         int[] sectorIds = { 1, 2 };
 
         foreach (var sId in sectorIds)
         {
             string rowLabel = (sId == 1) ? "Baja" : "Alta";
-            
-            // Offset: Sector 1 empieza en 0 (+1=1), Sector 2 empieza en 50 (+1=51)
             int offset = (sId - 1) * 50; 
 
             for (int i = 1; i <= 50; i++) 
@@ -58,6 +61,7 @@ public class AppDbContext : DbContext
                 int seatNumber = i + offset;
 
                 seats.Add(new Seat { 
+                    // El ID se genera basado en el numero, asi no cambia nunca
                     Id = new Guid($"00000000-0000-0000-{sId:D4}-0000{seatNumber:D8}"), 
                     SectorId = sId, 
                     RowIdentifier = rowLabel, 
@@ -67,7 +71,6 @@ public class AppDbContext : DbContext
                 });
             }
         }
-        // Esto le dice a EF que use la lista que creamos arriba para llenar la tabla
         modelBuilder.Entity<Seat>().HasData(seats);
     }
 }

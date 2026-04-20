@@ -7,24 +7,24 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // ==========================================================================
-// 1. CONFIGURACIÓN DE SERVICIOS BÁSICOS
+// 1. CONFIGURACION DE SERVICIOS BASICOS
 // ==========================================================================
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(); // Obligatorio para documentar la API
 
 // ==========================================================================
-// 2. CONFIGURACIÓN DE LA BASE DE DATOS (PostgreSQL - Puerto 5433)
+// 2. CONFIGURACION DE LA BASE DE DATOS (PostgreSQL - Puerto 5433)
 // ==========================================================================
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ==========================================================================
-// 3. INYECCIÓN DE DEPENDENCIAS (Jerarquía de Capas)
+// 3. INYECCION DE DEPENDENCIAS (Jerarquia de Capas)
 // ==========================================================================
 
 // REPOSITORIOS (Infrastructure)
-// "Cuando se pida la interfaz IEventRepository, entregar la implementación EventRepository"
+// "Cuando se pida la interfaz IEventRepository, entregar la implementacion EventRepository"
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 
 // CASOS DE USO / HANDLERS (Application)

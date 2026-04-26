@@ -1,26 +1,45 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import Login from "./Login";
+import Register from "./Register";
 
 function App() {
   const [seats, setSeats] = useState([]);
   const [selectedSeats, setSelectedSeats] = useState([]);
-  // Estado para manejar el sector actual (1 para Baja, 2 para Alta)
   const [sectorId, setSectorId] = useState(1);
 
-  useEffect(() => {
-    // Pedimos los asientos a la API usando el sectorId actual
+  const [isLogged, setIsLogged] = useState(
+    !!localStorage.getItem("userId")
+  );
+
+  const [view, setView] = useState("login"); // login | register
+
+  // FUNCION PARA CARGAR ASIENTOS
+  const loadSeats = () => {
     fetch(`http://localhost:5171/api/v1/events/${sectorId}/seats`)
       .then(res => res.json())
+<<<<<<< Updated upstream
       .then(data => {
         setSeats(data);
         // Mantenemos selectedSeats intacto para persistencia entre sectores
       })
       .catch(err => console.error("Error al conectar con la API:", err));
   }, [sectorId]); 
+=======
+      .then(data => setSeats(data))
+      .catch(err => console.error(err));
+  };
+
+  useEffect(() => {
+    if (!isLogged) return;
+    loadSeats();
+    setSelectedSeats([]);
+  }, [sectorId, isLogged]);
+>>>>>>> Stashed changes
 
   const toggleSeat = (seatId, status) => {
     if (status !== 'Available') return;
-    
+
     if (selectedSeats.includes(seatId)) {
       setSelectedSeats(selectedSeats.filter(id => id !== seatId));
     } else {
@@ -28,6 +47,7 @@ function App() {
     }
   };
 
+<<<<<<< Updated upstream
   const handleConfirm = () => {
     alert(`Reserva simulada exitosa.\nTotal de asientos seleccionados: ${selectedSeats.length}\n\nLos IDs están persistidos en el estado de la App.`);
   };
@@ -39,12 +59,89 @@ function App() {
     }
   };
 
+=======
+  const handleConfirm = async () => {
+  const userId = localStorage.getItem("userId");
+
+  try {
+    const response = await fetch("http://localhost:5171/api/v1/reservations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        userId: parseInt(userId),
+        seatIds: selectedSeats
+      })
+    });
+
+    const text = await response.text(); 
+    console.log("RESPUESTA BACKEND:", text);
+
+    if (!response.ok) {
+      alert("Error al reservar: " + text);
+      return;
+    }
+
+    alert("Reserva realizada con éxito");
+    setSelectedSeats([]);
+    loadSeats();
+
+  } catch (error) {
+    console.error(error);
+    alert("Error de conexión");
+  }
+};
+
+  const handleLogout = () => {
+    localStorage.removeItem("userId");
+    setIsLogged(false);
+    setView("login");
+  };
+
+  //SI NO ESTÁ LOGUEADO → MOSTRAR LOGIN / REGISTER
+  if (!isLogged) {
+    if (view === "login") {
+      return (
+        <Login 
+          onLogin={() => setIsLogged(true)}
+          goToRegister={() => setView("register")}
+        />
+      );
+    }
+
+    return (
+      <Register 
+        goToLogin={() => setView("login")}
+      />
+    );
+  }
+
+  
+>>>>>>> Stashed changes
   return (
     <div style={{ padding: '20px', textAlign: 'center', fontFamily: 'Arial, sans-serif' }}>
-      <h1>Sistema de Ticketing - Entrega 1</h1>
       
-      {/* --- SELECTOR DE SECTORES --- */}
+      <h1>Sistema de Ticketing - Entrega 1</h1>
+
+      <button 
+        onClick={handleLogout}
+        style={{
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          padding: "8px 15px",
+          backgroundColor: "#e74c3c",
+          color: "white",
+          border: "none",
+          borderRadius: "5px"
+        }}>
+        Logout
+      </button>
+
+      {/* SECTORES */}
       <div style={{ marginBottom: '20px', display: 'flex', gap: '15px', justifyContent: 'center' }}>
+<<<<<<< Updated upstream
         <button 
           onClick={() => setSectorId(1)}
           style={{
@@ -71,48 +168,65 @@ function App() {
             fontWeight: 'bold',
             transition: '0.3s'
           }}>
+=======
+        <button onClick={() => setSectorId(1)}>
+          Platea Baja
+        </button>
+
+        <button onClick={() => setSectorId(2)}>
+>>>>>>> Stashed changes
           Platea Alta
         </button>
       </div>
 
+<<<<<<< Updated upstream
       <h3>Mapa: {sectorId === 1 ? 'Platea Baja' : 'Platea Alta'}</h3>
       
       <div style={{ marginBottom: '10px', fontSize: '18px' }}>
         Asientos seleccionados en total: <strong>{selectedSeats.length}</strong>
+=======
+      <h3>{sectorId === 1 ? 'Platea Baja' : 'Platea Alta'}</h3>
+
+      <div>
+        Asientos seleccionados: <strong>{selectedSeats.length}</strong>
+>>>>>>> Stashed changes
       </div>
 
-      {/* --- GRILLA DE ASIENTOS --- */}
+      {/* GRILLA */}
       <div style={{ 
         display: 'grid', 
         gridTemplateColumns: 'repeat(10, 45px)', 
         gap: '10px', 
         justifyContent: 'center',
-        marginTop: '20px',
-        backgroundColor: '#f4f4f4',
-        padding: '20px',
-        borderRadius: '10px',
-        border: '1px solid #ddd'
+        marginTop: '20px'
       }}>
         {seats.map(seat => {
           const isSelected = selectedSeats.includes(seat.id);
+
           return (
             <div 
-              key={seat.id} 
+              key={seat.id}
               onClick={() => toggleSeat(seat.id, seat.status)}
               style={{
                 width: '45px',
                 height: '45px',
-                backgroundColor: isSelected ? '#3498db' : (seat.status === 'Available' ? '#2ecc71' : '#e74c3c'),
+                backgroundColor: isSelected 
+                  ? '#3498db' 
+                  : (seat.status === 'Available' ? '#2ecc71' : '#e74c3c'),
                 color: 'white',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: '5px',
+<<<<<<< Updated upstream
                 fontSize: '12px',
                 fontWeight: 'bold',
                 cursor: seat.status === 'Available' ? 'pointer' : 'not-allowed',
                 transform: isSelected ? 'scale(1.1)' : 'scale(1)',
                 transition: 'all 0.2s ease'
+=======
+                cursor: seat.status === 'Available' ? 'pointer' : 'not-allowed'
+>>>>>>> Stashed changes
               }}>
               {seat.seatNumber}
             </div>
@@ -120,6 +234,7 @@ function App() {
         })}
       </div>
 
+<<<<<<< Updated upstream
       {/* --- LEYENDA --- */}
       <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '20px' }}>
         <span>🟢 Disponible</span>
@@ -164,11 +279,20 @@ function App() {
             transition: '0.3s'
           }}>
           Confirmar ({selectedSeats.length})
+=======
+      <div style={{ marginTop: '30px' }}>
+        <button 
+          disabled={selectedSeats.length === 0}
+          onClick={handleConfirm}
+        >
+          Confirmar Reserva
+>>>>>>> Stashed changes
         </button>
 
       </div>
+
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

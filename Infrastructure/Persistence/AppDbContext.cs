@@ -10,6 +10,10 @@ public class AppDbContext : DbContext
     public DbSet<Event> Events { get; set; }
     public DbSet<Sector> Sectors { get; set; }
     public DbSet<Seat> Seats { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Reservation> Reservations { get; set; }
+
+    public DbSet<AuditLog> AuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -72,5 +76,12 @@ public class AppDbContext : DbContext
             }
         }
         modelBuilder.Entity<Seat>().HasData(seats);
+
+
+
+        modelBuilder.Entity<User>().HasData(new User{Id = 1,Email = "admin@test.com",Password = "1234"});
+        
     }
+
+ 
 }

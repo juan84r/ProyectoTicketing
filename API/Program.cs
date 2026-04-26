@@ -3,6 +3,7 @@ using Infrastructure.Repositories;
 using Application.Interfaces;
 using Application.UseCases.Events.Queries;
 using Microsoft.EntityFrameworkCore;
+using Application.UseCases.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ builder.Services.AddSwaggerGen(); // Obligatorio para documentar la API
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
 // ==========================================================================
 // 3. INYECCION DE DEPENDENCIAS (Jerarquia de Capas)
 // ==========================================================================
@@ -31,6 +33,19 @@ builder.Services.AddScoped<IEventRepository, EventRepository>();
 // Estos contienen la lógica de negocio para las consultas (Queries)
 builder.Services.AddScoped<GetEventsHandler>();
 builder.Services.AddScoped<GetSeatsBySectorHandler>();
+
+//para el login
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<LoginHandler>();
+builder.Services.AddScoped<ISeatRepository, SeatRepository>();
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<CreateReservationHandler>();
+builder.Services.AddScoped<RegisterHandler>();
+builder.Services.AddScoped<LoginHandler>();
+
+//auditoria
+//builder.Services.AddScoped<IAuditRepository, AuditRepository>();
+
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll", policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());

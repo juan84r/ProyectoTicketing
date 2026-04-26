@@ -40,3 +40,30 @@
 .read-the-docs {
   color: #888;
 }
+
+
+.login-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #1e2a38;
+  color: white;
+}
+
+.login-container input {
+  margin: 10px;
+  padding: 10px;
+  width: 250px;
+  border-radius: 5px;
+  border: none;
+}
+
+.login-container button {
+  padding: 10px 20px;
+  background: orange;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

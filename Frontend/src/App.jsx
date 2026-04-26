@@ -18,14 +18,6 @@ function App() {
   const loadSeats = () => {
     fetch(`http://localhost:5171/api/v1/events/${sectorId}/seats`)
       .then(res => res.json())
-<<<<<<< Updated upstream
-      .then(data => {
-        setSeats(data);
-        // Mantenemos selectedSeats intacto para persistencia entre sectores
-      })
-      .catch(err => console.error("Error al conectar con la API:", err));
-  }, [sectorId]); 
-=======
       .then(data => setSeats(data))
       .catch(err => console.error(err));
   };
@@ -35,7 +27,6 @@ function App() {
     loadSeats();
     setSelectedSeats([]);
   }, [sectorId, isLogged]);
->>>>>>> Stashed changes
 
   const toggleSeat = (seatId, status) => {
     if (status !== 'Available') return;
@@ -47,19 +38,6 @@ function App() {
     }
   };
 
-<<<<<<< Updated upstream
-  const handleConfirm = () => {
-    alert(`Reserva simulada exitosa.\nTotal de asientos seleccionados: ${selectedSeats.length}\n\nLos IDs están persistidos en el estado de la App.`);
-  };
-
-  // Función para limpiar toda la selección
-  const resetSelection = () => {
-    if (window.confirm("¿Estás seguro de que quieres limpiar todos los asientos seleccionados?")) {
-      setSelectedSeats([]);
-    }
-  };
-
-=======
   const handleConfirm = async () => {
   const userId = localStorage.getItem("userId");
 
@@ -118,7 +96,6 @@ function App() {
   }
 
   
->>>>>>> Stashed changes
   return (
     <div style={{ padding: '20px', textAlign: 'center', fontFamily: 'Arial, sans-serif' }}>
       
@@ -141,55 +118,19 @@ function App() {
 
       {/* SECTORES */}
       <div style={{ marginBottom: '20px', display: 'flex', gap: '15px', justifyContent: 'center' }}>
-<<<<<<< Updated upstream
-        <button 
-          onClick={() => setSectorId(1)}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: sectorId === 1 ? '#3498db' : '#ecf0f1',
-            color: sectorId === 1 ? 'white' : 'black',
-            borderRadius: '5px',
-            border: '1px solid #bdc3c7',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            transition: '0.3s'
-          }}>
-          Platea Baja
-        </button>
-        <button 
-          onClick={() => setSectorId(2)}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: sectorId === 2 ? '#3498db' : '#ecf0f1',
-            color: sectorId === 2 ? 'white' : 'black',
-            borderRadius: '5px',
-            border: '1px solid #bdc3c7',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            transition: '0.3s'
-          }}>
-=======
         <button onClick={() => setSectorId(1)}>
           Platea Baja
         </button>
 
         <button onClick={() => setSectorId(2)}>
->>>>>>> Stashed changes
           Platea Alta
         </button>
       </div>
 
-<<<<<<< Updated upstream
-      <h3>Mapa: {sectorId === 1 ? 'Platea Baja' : 'Platea Alta'}</h3>
-      
-      <div style={{ marginBottom: '10px', fontSize: '18px' }}>
-        Asientos seleccionados en total: <strong>{selectedSeats.length}</strong>
-=======
       <h3>{sectorId === 1 ? 'Platea Baja' : 'Platea Alta'}</h3>
 
       <div>
         Asientos seleccionados: <strong>{selectedSeats.length}</strong>
->>>>>>> Stashed changes
       </div>
 
       {/* GRILLA */}
@@ -218,15 +159,7 @@ function App() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: '5px',
-<<<<<<< Updated upstream
-                fontSize: '12px',
-                fontWeight: 'bold',
-                cursor: seat.status === 'Available' ? 'pointer' : 'not-allowed',
-                transform: isSelected ? 'scale(1.1)' : 'scale(1)',
-                transition: 'all 0.2s ease'
-=======
                 cursor: seat.status === 'Available' ? 'pointer' : 'not-allowed'
->>>>>>> Stashed changes
               }}>
               {seat.seatNumber}
             </div>
@@ -234,61 +167,13 @@ function App() {
         })}
       </div>
 
-<<<<<<< Updated upstream
-      {/* --- LEYENDA --- */}
-      <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '20px' }}>
-        <span>🟢 Disponible</span>
-        <span>🔵 Seleccionado</span>
-        <span>🔴 Ocupado</span>
-      </div>
-
-      {/* --- ACCIONES --- */}
-      <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'center', gap: '15px' }}>
-        
-        {/* BOTÓN RESET */}
-        <button 
-          disabled={selectedSeats.length === 0}
-          onClick={resetSelection}
-          style={{
-            padding: '12px 25px',
-            fontSize: '16px',
-            backgroundColor: selectedSeats.length > 0 ? '#e74c3c' : '#bdc3c7',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: selectedSeats.length > 0 ? 'pointer' : 'not-allowed',
-            fontWeight: 'bold',
-            transition: '0.3s'
-          }}>
-          Vaciar Selección
-        </button>
-
-        {/* BOTÓN CONFIRMAR */}
-        <button 
-          disabled={selectedSeats.length === 0}
-          onClick={handleConfirm}
-          style={{
-            padding: '12px 25px',
-            fontSize: '16px',
-            backgroundColor: selectedSeats.length > 0 ? '#27ae60' : '#bdc3c7',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: selectedSeats.length > 0 ? 'pointer' : 'not-allowed',
-            fontWeight: 'bold',
-            transition: '0.3s'
-          }}>
-          Confirmar ({selectedSeats.length})
-=======
       <div style={{ marginTop: '30px' }}>
         <button 
           disabled={selectedSeats.length === 0}
           onClick={handleConfirm}
         >
           Confirmar Reserva
->>>>>>> Stashed changes
         </button>
-
       </div>
 
     </div>

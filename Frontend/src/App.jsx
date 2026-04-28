@@ -20,6 +20,7 @@ function App() {
   useEffect(() => {
     if (!isLogged) return;
     loadSeats();
+    
   }, [sectorId, isLogged]);
 
   const toggleSeat = (seatId, status) => {

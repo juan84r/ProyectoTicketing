@@ -4,7 +4,7 @@ using Application.Interfaces;
 namespace API.Controllers;
 
 [ApiController]
-[Route("api/v1/audit")]
+[Route("api/v1/audit-logs")]
 public class AuditController : ControllerBase
 {
     private readonly IAuditRepository _auditRepository;

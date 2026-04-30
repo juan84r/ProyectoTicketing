@@ -21,7 +21,7 @@ public async Task<IActionResult> Create(CreateReservationRequest request)
     var result = await _handler.Handle(request);
 
     return result switch
-    {
+    {//// Se mapea el resultado del caso de uso a códigos HTTP
         ReservationResult.SeatNotFound =>
             NotFound("El asiento no existe"),
 

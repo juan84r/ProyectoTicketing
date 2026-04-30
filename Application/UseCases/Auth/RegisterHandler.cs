@@ -21,7 +21,7 @@ public class RegisterHandler
         if (existingUser != null)
             return false;
 
-        // HASH PASSWORD
+        // Hash de la contraseña usando BCrypt
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
         var user = new User

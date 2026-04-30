@@ -23,7 +23,7 @@ public class CreateReservationHandler
 
     public async Task<ReservationResult> Handle(CreateReservationRequest request)
 {
-    // 🔥 1. VALIDAR TODO PRIMERO
+    // Validamos primero todos los datos para evitar modificaciones parciales en la base de datos
     var seats = new List<Seat>();
 
     foreach (var seatId in request.SeatIds)
@@ -63,7 +63,7 @@ public class CreateReservationHandler
         var log = new AuditLog
         {
             Action = "Seat Reserved",
-            User = user.Email,
+            User = user.Email, // Se usa email en auditoría para que el registro sea legible
             Resource = $"Asiento {seat.SeatNumber}",
             Timestamp = DateTime.UtcNow
         };

@@ -14,7 +14,7 @@ Este proyecto es un sistema de gestion de eventos y reserva de asientos, desarro
 * **PostgreSQL** instalado y corriendo (Puerto 5433).
 * **.NET 8 SDK**.
 * **Node.js** y **npm**.
-* Configurar la cadena de conexión en:API/appsettings.json
+* Configurar la cadena de conexión en: API/appsettings.json
     "ConnectionStrings": {
       "DefaultConnection": "Host=localhost;Port=5432;Database=Ticket_db;Username=postgres;Password=1234"
         }
@@ -39,11 +39,11 @@ Desde la terminal en la carpeta raiz del proyecto:
    npm run dev
 
 ### Uso del Sistema
-   Registrarse con un email y contraseña
+   Registrarse con un email y contraseña,
    Iniciar sesión
-   Seleccionar un sector (Platea Baja / Alta)
-   Elegir asientos disponibles
-   Confirmar la reserva
+   ,Seleccionar un sector (Platea Baja / Alta)
+   ,Elegir asientos disponibles
+   ,Confirmar la reserva
 
 Tecnologías utilizadas
 

@@ -19,7 +19,7 @@ public class LoginHandler
         if (user == null)
             return null;
 
-        // VALIDACIÓN
+        // VALIDACIÓN de contraseña usando BCrypt
         bool isValid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
 
         if (!isValid)

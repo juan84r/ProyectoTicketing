@@ -44,7 +44,7 @@ builder.Services.AddScoped<RegisterHandler>();
 builder.Services.AddScoped<LoginHandler>();
 
 //auditoria
-//builder.Services.AddScoped<IAuditRepository, AuditRepository>();
+builder.Services.AddScoped<IAuditRepository, AuditRepository>();
 
 
 builder.Services.AddCors(options => {

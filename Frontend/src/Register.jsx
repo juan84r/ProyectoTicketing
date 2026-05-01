@@ -4,24 +4,40 @@ import fondo from "./assets/fondo.jpg";
 function Register({ goToLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const isValidEmail = (email) => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
 
   const handleRegister = async () => {
-    const res = await fetch("http://localhost:5171/api/v1/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email, password })
-    });
 
-    if (!res.ok) {
-      alert("Error al registrarse");
-      return;
-    }
+  //VALIDACIÓN DE EMAIL
+  if (!isValidEmail(email)) {
+    alert("Ingresá un correo válido (ej: usuario@gmail.com)");
+    return;
+  }
 
-    alert("Usuario creado correctamente");
-    goToLogin();
-  };
+  //VALIDACIÓN DE PASSWORD
+  if (password.length < 4) {
+    alert("La contraseña debe tener al menos 4 caracteres");
+    return;
+  }
+
+  const res = await fetch("http://localhost:5171/api/v1/auth/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email, password })
+  });
+
+  if (!res.ok) {
+    alert("Error al registrarse, El usuario ya existe");
+    return;
+  }
+
+  alert("Usuario creado correctamente");
+  goToLogin();
+};
 
 return (
   <div 

@@ -16,13 +16,25 @@ public class ReservationsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateReservationRequest request)
-    {
-        var result = await _handler.Handle(request);
+public async Task<IActionResult> Create(CreateReservationRequest request)
+{
+    var result = await _handler.Handle(request);
 
-        if (!result)
-            return BadRequest("No se pudo reservar el asiento");
+    return result switch
+    {//// Se mapea el resultado del caso de uso a códigos HTTP
+        ReservationResult.SeatNotFound =>
+            NotFound("El asiento no existe"),
 
-        return Ok("Reserva exitosa");
-    }
+        ReservationResult.SeatAlreadyReserved =>
+            Conflict("El asiento ya está reservado"),
+
+        ReservationResult.UserNotFound =>
+            NotFound("El usuario no existe"),
+
+        ReservationResult.Success =>
+            Created("", "Reserva realizada correctamente"),
+
+        _ => StatusCode(500, "Error inesperado")
+    };
+}
 }

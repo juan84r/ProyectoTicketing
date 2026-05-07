@@ -4,6 +4,8 @@ using Application.Interfaces;
 using Application.UseCases.Events.Queries;
 using Microsoft.EntityFrameworkCore;
 using Application.UseCases.Auth;
+using Application.UseCases.Reservations;
+using Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +48,12 @@ builder.Services.AddScoped<LoginHandler>();
 //auditoria
 builder.Services.AddScoped<IAuditRepository, AuditRepository>();
 
+
+// Para el pago
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<ConfirmPaymentHandler>();
+
+builder.Services.AddHostedService<ReservationCleanupService>();
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll", policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());

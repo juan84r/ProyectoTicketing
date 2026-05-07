@@ -24,9 +24,9 @@ public class AppDbContext : DbContext
             .Property(s => s.Price)
             .HasPrecision(18, 2);
 
-        modelBuilder.Entity<Seat>()
-            .Property(s => s.Version)
-            .IsConcurrencyToken();
+        //modelBuilder.Entity<Seat>()
+            //.Property(s => s.Version)
+            //.IsConcurrencyToken();
 
         // RESTRICCION DE UNICIDAD: Evita duplicados fisicos en la BD
         modelBuilder.Entity<Seat>()

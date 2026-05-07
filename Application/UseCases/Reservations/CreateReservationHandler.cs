@@ -1,6 +1,8 @@
 using Application.Interfaces;
 using Domain.Entities;
 using Application.UseCases.Reservations;
+using Domain.Constants;
+using Application.DTOs;
 
 public class CreateReservationHandler
 {
@@ -9,6 +11,7 @@ public class CreateReservationHandler
     private readonly IUserRepository _userRepository;
     private readonly IAuditRepository _auditRepository;
 
+    // Validamos primero todos los datos para evitar modificaciones parciales en la base de datos
     public CreateReservationHandler(
         ISeatRepository seatRepository,
         IReservationRepository reservationRepository,
@@ -21,56 +24,89 @@ public class CreateReservationHandler
         _userRepository = userRepository;
     }
 
-    public async Task<ReservationResult> Handle(CreateReservationRequest request)
-{
-    // Validamos primero todos los datos para evitar modificaciones parciales en la base de datos
-    var seats = new List<Seat>();
-
-    foreach (var seatId in request.SeatIds)
+    public async Task<ReservationResponse> Handle(CreateReservationRequest request)
     {
-        var seat = await _seatRepository.GetByIdAsync(seatId);
-
-        if (seat == null)
-            return ReservationResult.SeatNotFound;
-
-        if (seat.Status != "Available")
-            return ReservationResult.SeatAlreadyReserved;
-
-        seats.Add(seat);
-    }
-
-    var user = await _userRepository.GetByIdAsync(request.UserId);
-
-    if (user == null)
-        return ReservationResult.UserNotFound;
-
-    
-    foreach (var seat in seats)
-    {
-        seat.Status = "Reserved";
-        await _seatRepository.UpdateAsync(seat);
-
-        var reservation = new Reservation
+        try
         {
-            Id = Guid.NewGuid(),
-            SeatId = seat.Id,
-            UserId = request.UserId,
-            ReservedAt = DateTime.UtcNow
-        };
+            var seats = new List<Seat>();
 
-        await _reservationRepository.AddAsync(reservation);
+            foreach (var seatId in request.SeatIds)
+            {
+                var seat = await _seatRepository.GetByIdAsync(seatId);
 
-        var log = new AuditLog
+                if (seat == null)
+                {
+                    return new ReservationResponse
+                    {
+                        Result = ReservationResult.SeatNotFound
+                    };
+                }
+
+                if (seat.Status != SeatStatus.Available)
+                {
+                    return new ReservationResponse
+                    {
+                        Result = ReservationResult.SeatAlreadyReserved
+                    };
+                }
+
+                seats.Add(seat);
+            }
+
+            var user = await _userRepository.GetByIdAsync(request.UserId);
+
+            if (user == null)
+            {
+                return new ReservationResponse
+                {
+                    Result = ReservationResult.UserNotFound
+                };
+            }
+
+            Guid reservationId = Guid.Empty;
+
+            foreach (var seat in seats)
+            {
+                seat.Status = SeatStatus.Reserved;
+
+                await _seatRepository.UpdateAsync(seat);
+
+                var reservation = new Reservation
+                {
+                    Id = Guid.NewGuid(),
+                    SeatId = seat.Id,
+                    UserId = request.UserId,
+                    ReservedAt = DateTime.UtcNow,
+                    Status = ReservationStatus.Pending
+                };
+
+                reservationId = reservation.Id;
+
+                await _reservationRepository.AddAsync(reservation);
+
+                var log = new AuditLog
+                {
+                    Action = "Seat Reserved",
+                    User = user.Email,
+                    Resource = $"Asiento {seat.SeatNumber}",
+                    Timestamp = DateTime.UtcNow
+                };
+
+                await _auditRepository.AddAsync(log);
+            }
+
+            return new ReservationResponse
+            {
+                Result = ReservationResult.Success,
+                ReservationId = reservationId
+            };
+        }
+        catch (Exception)
         {
-            Action = "Seat Reserved",
-            User = user.Email, // Se usa email en auditoría para que el registro sea legible
-            Resource = $"Asiento {seat.SeatNumber}",
-            Timestamp = DateTime.UtcNow
-        };
-
-        await _auditRepository.AddAsync(log);
+            return new ReservationResponse
+            {
+                Result = ReservationResult.SeatAlreadyReserved
+            };
+        }
     }
-
-    return ReservationResult.Success;
-}
 }

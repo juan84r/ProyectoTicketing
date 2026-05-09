@@ -1,8 +1,9 @@
 using Domain.Entities;
+using Application.UseCases.Reservations;
 
 namespace Application.Interfaces;
 
 public interface IPaymentRepository
 {
-    Task<bool> ConfirmPaymentAsync(Guid reservationId);
+    Task<PaymentResult> ConfirmPaymentAsync(Guid reservationId);
 }

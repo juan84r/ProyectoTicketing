@@ -6,5 +6,5 @@ public class ReservationResponse
 
      public ReservationResult Result { get; set; }
 
-    public Guid? ReservationId { get; set; }
+    public List<Guid> ReservationIds { get; set; } = new();
 }

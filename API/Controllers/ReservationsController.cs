@@ -44,13 +44,22 @@ public class ReservationsController : ControllerBase
     }
 
     [HttpPost("confirm")]
-    public async Task<IActionResult> ConfirmPayment(ConfirmPaymentRequest request)
+public async Task<IActionResult> ConfirmPayment(ConfirmPaymentRequest request)
+{
+    var result = await _paymentHandler.Handle(request.ReservationId);
+
+    return result switch
     {
-        var success = await _paymentHandler.Handle(request.ReservationId);
+        PaymentResult.ReservationNotFound =>
+            NotFound("La reserva no existe"),
 
-        if (!success)
-            return BadRequest("No se pudo confirmar el pago");
+        PaymentResult.AlreadyPaid =>
+            Conflict("La reserva ya fue pagada o el asiento ya fue vendido"),
 
-        return Ok("Pago confirmado correctamente");
-    }
+        PaymentResult.Success =>
+            Ok("Pago confirmado correctamente"),
+
+        _ => StatusCode(500, "Error inesperado")
+    };
+}
 }

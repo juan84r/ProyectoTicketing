@@ -11,7 +11,7 @@ public class ConfirmPaymentHandler
         _paymentRepository = paymentRepository;
     }
 
-    public async Task<bool> Handle(Guid reservationId)
+    public async Task<PaymentResult> Handle(Guid reservationId)
     {
         return await _paymentRepository
             .ConfirmPaymentAsync(reservationId);

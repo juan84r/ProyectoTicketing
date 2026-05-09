@@ -19,8 +19,8 @@ function App() {
   const [timeLeft, setTimeLeft] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
 
-  // ID de reserva para confirmar pago
-  const [reservationId, setReservationId] = useState(null);
+  // Ahora guardamos múltiples reservationIds
+  const [reservationIds, setReservationIds] = useState([]);
 
   // Cargar asientos
   const loadSeats = () => {
@@ -32,6 +32,7 @@ function App() {
 
   // Recargar cuando cambia sector o login
   useEffect(() => {
+
     if (!isLogged) return;
 
     loadSeats();
@@ -47,13 +48,12 @@ function App() {
 
       setTimerActive(false);
 
-      setReservationId(null);
+      setReservationIds([]);
 
       alert("La reserva expiró");
 
-      setTimeout(() => {
-        loadSeats();
-         }, 35000);
+      loadSeats();
+
       return;
     }
 
@@ -64,19 +64,19 @@ function App() {
     return () => clearInterval(interval);
 
   }, [timeLeft, timerActive]);
-  
-// Refrescar asientos cada 5 segundos para evitar conflictos
+
+  // Refrescar asientos cada 5 segundos
   useEffect(() => {
 
-  if (!isLogged) return;
+    if (!isLogged) return;
 
-  const interval = setInterval(() => {
-    loadSeats();
-  }, 5000);
+    const interval = setInterval(() => {
+      loadSeats();
+    }, 5000);
 
-  return () => clearInterval(interval);
+    return () => clearInterval(interval);
 
-}, [sectorId, isLogged]);
+  }, [sectorId, isLogged]);
 
   // Seleccionar asiento
   const toggleSeat = (seatId, status) => {
@@ -155,8 +155,8 @@ function App() {
       // Obtener respuesta
       const data = await response.json();
 
-      // Guardar reservationId
-      setReservationId(data.reservationId);
+      // Guardar TODOS los reservationIds
+      setReservationIds(data.reservationIds);
 
       alert("Reserva realizada con éxito");
 
@@ -182,28 +182,31 @@ function App() {
   // Confirmar pago
   const handlePayment = async () => {
 
-    if (!reservationId) return;
+    if (reservationIds.length === 0) return;
 
     try {
 
-      const response = await fetch(
-        "http://localhost:5171/api/v1/reservations/confirm",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            reservationId: reservationId
-          })
+      for (const reservationId of reservationIds) {
+
+        const response = await fetch(
+          "http://localhost:5171/api/v1/reservations/confirm",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              reservationId: reservationId
+            })
+          }
+        );
+
+        if (!response.ok) {
+
+          alert("No se pudo confirmar uno de los pagos");
+
+          return;
         }
-      );
-
-      if (!response.ok) {
-
-        alert("No se pudo confirmar el pago");
-
-        return;
       }
 
       alert("Pago confirmado correctamente");
@@ -213,8 +216,8 @@ function App() {
 
       setTimeLeft(0);
 
-      // Limpiar reserva actual
-      setReservationId(null);
+      // Limpiar reservas
+      setReservationIds([]);
 
       // Limpiar selección
       setSelectedSeats([]);
@@ -535,7 +538,7 @@ function App() {
       </div>
 
       {/* Botón pagar */}
-      {timerActive && reservationId && (
+      {timerActive && reservationIds.length > 0 && (
         <div style={{ marginTop: '20px' }}>
 
           <button

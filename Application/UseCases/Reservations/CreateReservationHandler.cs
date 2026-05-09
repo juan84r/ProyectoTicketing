@@ -63,7 +63,8 @@ public class CreateReservationHandler
                 };
             }
 
-            Guid reservationId = Guid.Empty;
+            //guardamos TODOS los reservationIds
+            var reservationIds = new List<Guid>();
 
             foreach (var seat in seats)
             {
@@ -80,7 +81,8 @@ public class CreateReservationHandler
                     Status = ReservationStatus.Pending
                 };
 
-                reservationId = reservation.Id;
+                // Guardamos cada ID
+                reservationIds.Add(reservation.Id);
 
                 await _reservationRepository.AddAsync(reservation);
 
@@ -98,7 +100,7 @@ public class CreateReservationHandler
             return new ReservationResponse
             {
                 Result = ReservationResult.Success,
-                ReservationId = reservationId
+                ReservationIds = reservationIds
             };
         }
         catch (Exception)

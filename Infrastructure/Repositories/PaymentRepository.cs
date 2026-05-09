@@ -1,8 +1,10 @@
 using Application.Interfaces;
+using Application.UseCases.Reservations;
 using Domain.Constants;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+
 
 namespace Infrastructure.Repositories;
 
@@ -15,7 +17,7 @@ public class PaymentRepository : IPaymentRepository
         _context = context;
     }
 
-    public async Task<bool> ConfirmPaymentAsync(Guid reservationId)
+    public async Task<PaymentResult> ConfirmPaymentAsync(Guid reservationId)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -25,24 +27,25 @@ public class PaymentRepository : IPaymentRepository
                 .FirstOrDefaultAsync(r => r.Id == reservationId);
 
             if (reservation == null)
-                return false;
+                return PaymentResult.ReservationNotFound;
 
             var seat = await _context.Seats
                 .FirstOrDefaultAsync(s => s.Id == reservation.SeatId);
 
             if (seat == null)
-                return false;
+                return PaymentResult.ReservationNotFound;
 
+            // Evita doble pago
             if (reservation.Status == ReservationStatus.Paid)
-                return false;
+                return PaymentResult.AlreadyPaid;
 
+            // Evita vender dos veces
             if (seat.Status == SeatStatus.Sold)
-                return false;
+                return PaymentResult.AlreadyPaid;
 
-              // Cambiamos estados
+            // Cambiamos estados
             reservation.Status = ReservationStatus.Paid;
             seat.Status = SeatStatus.Sold;
-
 
             // Auditoría
             _context.AuditLogs.Add(new AuditLog
@@ -57,12 +60,13 @@ public class PaymentRepository : IPaymentRepository
 
             await transaction.CommitAsync();
 
-            return true;
+            return PaymentResult.Success;
         }
         catch
         {
             await transaction.RollbackAsync();
-            return false;
+
+            return PaymentResult.AlreadyPaid;
         }
     }
 }
